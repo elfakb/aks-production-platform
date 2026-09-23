@@ -1,0 +1,43 @@
+replicaCount: 2
+
+image:
+  repository: "<ACR_LOGIN_SERVER>/myapp"
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+serviceAccount:
+  name: myapp-sa
+  workloadIdentityClientId: "<WORKLOAD_IDENTITY_CLIENT_ID>"
+
+config:
+  appEnv: "production"
+  logLevel: "info"
+  keyVaultName: "<KEY_VAULT_NAME>"
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8080
+
+ingress:
+  enabled: true
+  className: "nginx"
+  path: "/"
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "128Mi"
+  limits:
+    cpu: "250m"
+    memory: "256Mi"
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+probes:
+  path: /healthz
+  port: 8080
